@@ -1,0 +1,5 @@
+parameters:
+  level: 5   # niveau strictité (0 = faible, 8 = très strict)
+  paths:
+    - app/
+    - public/

@@ -1,0 +1,15 @@
+.admin-dashboard {
+  .table {
+    th {
+      background-color: $primary;
+      color: white;
+    }
+    td {
+      vertical-align: middle;
+    }
+  }
+
+  .btn {
+    margin-right: 0.5rem;
+  }
+}

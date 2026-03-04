@@ -1,0 +1,24 @@
+{
+    "name": "sophi/projet1",
+    "description": "Mon premier projet PHP avec autoload",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Sophi\\Projet1\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "SophieG",
+            "email": "sophiegenot@hotmail.fr"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "izniburak/router": "^3.1"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.5"
+    }
+}

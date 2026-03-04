@@ -1,0 +1,23 @@
+.login-form {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: $custom-light-blue;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+  .form-control {
+    margin-bottom: 1rem;
+  }
+
+  .btn-primary {
+    width: 100%;
+    background-color: $primary;
+    border-color: $primary;
+
+    &:hover {
+      background-color: darken($primary, 10%);
+      border-color: darken($primary, 10%);
+    }
+  }
+}

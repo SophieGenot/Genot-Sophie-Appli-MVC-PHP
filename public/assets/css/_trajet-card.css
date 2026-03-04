@@ -1,0 +1,8 @@
+.trajet-card{background-color:#fff;border:1px solid #d6d7db;border-radius:.5rem;padding:1rem;margin-bottom:1rem;box-shadow:0 0 5px rgba(0,0,0,.05)}
+.trajet-card .trajet-header{font-weight:700;color:#00497c;margin-bottom:.5rem}
+.trajet-card .trajet-info{display:flex;justify-content:space-between;margin-bottom:.5rem}
+.trajet-card .trajet-info span{font-weight:500}
+.trajet-card .btn{margin-top:.5rem}
+.modal-content .modal-header{background-color:#0074c7;color:#fff}
+.modal-content .modal-body{line-height:1.5}
+.modal-content .btn-close{filter:brightness(.8)}

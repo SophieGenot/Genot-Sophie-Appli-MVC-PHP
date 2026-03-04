@@ -1,0 +1,34 @@
+header {
+    background-color:#0074c7;
+    color:#fff;
+    padding:1rem 2rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center
+}
+header .app-name{font-weight:700;font-size:1.5rem}
+header .btn{margin-left:.5rem}
+header .user-info{display:flex;align-items:center;gap:1rem}
+@media (max-width:768px){header{flex-direction:column;gap:.5rem}header .user-info{flex-direction:column;align-items:flex-start}}
+footer{background-color:#384050;color:#fff;text-align:center;padding:1rem 0}
+footer .app-name{font-weight:700;font-size:1.2rem}
+footer small{display:block;margin-top:.25rem;font-size:.9rem;color:#a6a9b0}
+.login-form{max-width:400px;margin:2rem auto;padding:2rem;background-color:#f1f8fc;border-radius:.5rem;box-shadow:0 0 10px rgba(0,0,0,.1)}
+.login-form .form-control{margin-bottom:1rem}
+.login-form .btn-primary{width:100%;background-color:#0074c7;border-color:#0074c7}
+.login-form .btn-primary:hover{background-color:#0061a1;border-color:#0061a1}
+.trajet-card{background-color:#fff;border:1px solid #d6d7db;border-radius:.5rem;padding:1rem;margin-bottom:1rem;box-shadow:0 0 5px rgba(0,0,0,.05)}
+.trajet-card .trajet-header{font-weight:700;color:#00497c;margin-bottom:.5rem}
+.trajet-card .trajet-info{display:flex;justify-content:space-between;margin-bottom:.5rem}
+.trajet-card .trajet-info span{font-weight:500}
+.trajet-card .btn{margin-top:.5rem}
+.modal-content .modal-header{background-color:#0074c7;color:#fff}
+.modal-content .modal-body{line-height:1.5}
+.modal-content .btn-close{filter:brightness(.8)}
+.trajet-form{max-width:600px;margin:2rem auto}
+.trajet-form .form-control[readonly]{background-color:#f4fbff}
+.trajet-form .btn-submit{background-color:#82b864;color:#fff;width:100%}
+.trajet-form .btn-submit:hover{background-color:#6fa351}
+.admin-dashboard .table th{background-color:#0074c7;color:#fff}
+.admin-dashboard .table td{vertical-align:middle}
+.admin-dashboard .btn{margin-right:.5rem}
