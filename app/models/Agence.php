@@ -1,40 +1,23 @@
 <?php
-class Agence {
-    private PDO $pdo;
+require_once __DIR__ . '/AbstractModel.php';
 
-    public function __construct(PDO $pdo) {
-        $this->pdo = $pdo;
-    }
+class Agence extends AbstractModel {
 
-    // Récupérer toutes les agences
+    protected string $table = 'agences';
     public function findAll(): array {
-        $stmt = $this->pdo->query("SELECT * FROM agences ORDER BY nom ASC");
+        $stmt = $this->pdo->query("SELECT * FROM {$this->table} ORDER BY nom ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Récupérer une agence par ID
-    public function findById(int $id): ?array {
-        $stmt = $this->pdo->prepare("SELECT * FROM agences WHERE id = ?");
-        $stmt->execute([$id]);
-        $agence = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $agence ?: null;
     }
 
     // Créer une nouvelle agence
     public function create(string $nom): bool {
-        $stmt = $this->pdo->prepare("INSERT INTO agences (nom) VALUES (?)");
+        $stmt = $this->pdo->prepare("INSERT INTO {$this->table} (nom) VALUES (?)");
         return $stmt->execute([$nom]);
     }
 
     // Mettre à jour une agence
     public function update(int $id, string $nom): bool {
-        $stmt = $this->pdo->prepare("UPDATE agences SET nom = ? WHERE id = ?");
+        $stmt = $this->pdo->prepare("UPDATE {$this->table} SET nom = ? WHERE id = ?");
         return $stmt->execute([$nom, $id]);
-    }
-
-    // Supprimer une agence
-    public function delete(int $id): bool {
-        $stmt = $this->pdo->prepare("DELETE FROM agences WHERE id = ?");
-        return $stmt->execute([$id]);
     }
 }

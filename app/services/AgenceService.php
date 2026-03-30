@@ -1,11 +1,13 @@
 <?php 
+require_once __DIR__ . '/AbstractService.php'; 
 require_once __DIR__ . '/../models/Agence.php';
 
-class AgenceService {
-    private $agenceModel;
+class AgenceService extends AbstractService {
+    private Agence $agenceModel;
 
-    public function __construct($pdo) {
-        $this->agenceModel = new Agence($pdo);
+    public function __construct(PDO $pdo) {
+        parent::__construct($pdo);
+        $this->agenceModel = new Agence($this->pdo);
     }
 
     // Récupérer toutes les agences
@@ -13,7 +15,7 @@ class AgenceService {
         return $this->agenceModel->findAll();
     }
 
-    // Créer une agence (accessible uniquement via contrôleur admin)
+    // Créer une agence
     public function createAgence($nom) {
         if (empty($nom)) {
             throw new Exception("Le nom de l'agence est requis.");

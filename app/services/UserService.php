@@ -1,11 +1,13 @@
 <?php
+require_once __DIR__ . '/AbstractService.php';
 require_once __DIR__ . '/../models/User.php';
 
-class UserService {
-    private $userModel;
+class UserService extends AbstractService {
+    private User $userModel;
 
     public function __construct(PDO $pdo) {
-        $this->userModel = new User($pdo);
+        parent::__construct($pdo);
+        $this->userModel = new User($this->pdo);
     }
 
     // Récupérer tous les utilisateurs
@@ -18,7 +20,7 @@ class UserService {
         return $this->userModel->findById($id);
     }
 
-    // Récupérer un utilisateur par email (utile pour la connexion)
+    // Récupérer un utilisateur par email
     public function getUserByEmail(string $email): ?array {
         return $this->userModel->findByEmail($email);
     }
@@ -29,7 +31,7 @@ class UserService {
             throw new Exception("Données utilisateur incomplètes");
         }
 
-        // Hash du mot de passe
+        // Sécurité : Hashage du mot de passe
         $data['mot_de_passe'] = password_hash($data['mot_de_passe'], PASSWORD_DEFAULT);
 
         return $this->userModel->create($data);
@@ -37,8 +39,10 @@ class UserService {
 
     // Mettre à jour un utilisateur
     public function updateUser(int $id, array $data): bool {
-        if (isset($data['mot_de_passe'])) {
+        if (!empty($data['mot_de_passe'])) {
             $data['mot_de_passe'] = password_hash($data['mot_de_passe'], PASSWORD_DEFAULT);
+        } else {
+            unset($data['mot_de_passe']);
         }
         return $this->userModel->update($id, $data);
     }

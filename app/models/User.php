@@ -1,26 +1,11 @@
 <?php
-class User {
-    private PDO $pdo;
+require_once __DIR__ . '/AbstractModel.php';
 
-    public function __construct(PDO $pdo) {
-        $this->pdo = $pdo;
-    }
+class User extends AbstractModel {
+    protected string $table = 'utilisateurs';
 
-    // Récupérer tous les utilisateurs
-    public function findAll(): array {
-        $stmt = $this->pdo->query("SELECT * FROM utilisateurs");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    // findAll() et findById() sont héritées du parent !
 
-    // Chercher un utilisateur par ID
-    public function findById(int $id): ?array {
-        $stmt = $this->pdo->prepare("SELECT * FROM utilisateurs WHERE id = ?");
-        $stmt->execute([$id]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
-    }
-
-    // Chercher un utilisateur par email
     public function findByEmail(string $email): ?array {
         $stmt = $this->pdo->prepare("SELECT * FROM utilisateurs WHERE email = ?");
         $stmt->execute([$email]);
@@ -28,7 +13,6 @@ class User {
         return $user ?: null;
     }
 
-    // Créer un nouvel utilisateur
     public function create(array $data): bool {
         $stmt = $this->pdo->prepare(
             "INSERT INTO utilisateurs (nom, prenom, telephone, email, mot_de_passe, role) 
@@ -44,7 +28,6 @@ class User {
         ]);
     }
 
-    // Mettre à jour un utilisateur
     public function update(int $id, array $data): bool {
         $fields = [];
         $values = [];
@@ -54,13 +37,6 @@ class User {
         }
         $values[] = $id;
         $sql = "UPDATE utilisateurs SET " . implode(", ", $fields) . " WHERE id = ?";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($values);
-    }
-
-    // Supprimer un utilisateur
-    public function delete(int $id): bool {
-        $stmt = $this->pdo->prepare("DELETE FROM utilisateurs WHERE id = ?");
-        return $stmt->execute([$id]);
+        return $this->pdo->prepare($sql)->execute($values);
     }
 }

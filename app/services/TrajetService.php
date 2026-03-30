@@ -1,17 +1,20 @@
 <?php
+require_once __DIR__ . '/AbstractService.php';
 require_once __DIR__ . '/../models/Trajet.php';
 require_once __DIR__ . '/../models/Agence.php';
 require_once __DIR__ . '/../models/User.php';
 
-class TrajetService {
-    private $trajetModel;
-    private $agenceModel;
-    private $userModel;
+class TrajetService extends AbstractService {
+    private Trajet $trajetModel;
+    private Agence $agenceModel;
+    private User $userModel;
 
-    public function __construct($pdo) {
-        $this->trajetModel = new Trajet($pdo);
-        $this->agenceModel = new Agence($pdo);
-        $this->userModel = new User($pdo);
+    public function __construct(PDO $pdo) {
+        parent::__construct($pdo);
+        
+        $this->trajetModel = new Trajet($this->pdo);
+        $this->agenceModel = new Agence($this->pdo);
+        $this->userModel = new User($this->pdo);
     }
 
     public function getAllTrajetsDisponiblesAvecInfos(): array {
@@ -71,21 +74,20 @@ class TrajetService {
     }
 
     public function getTrajetById($id) {
-    $trajet = $this->trajetModel->findById($id); // utilise ton modèle
-    if (!$trajet) return null;
+        $trajet = $this->trajetModel->findById($id);
+        if (!$trajet) return null;
 
-    // Ajoute les infos des agences et utilisateur
-    $trajet['agence_depart'] = $this->agenceModel->findById($trajet['agence_depart_id'])['nom'] ?? '';
-    $trajet['agence_arrivee'] = $this->agenceModel->findById($trajet['agence_arrivee_id'])['nom'] ?? '';
-    $user = $this->userModel->findById($trajet['auteur_id']);
-    $trajet['user_nom'] = $user['nom'] ?? '';
-    $trajet['user_prenom'] = $user['prenom'] ?? '';
-    $trajet['user_email'] = $user['email'] ?? '';
-    $trajet['user_tel'] = $user['telephone'] ?? '';
-    $trajet['places_dispo'] = $trajet['nb_places_disponibles'] ?? $trajet['nb_places_total'];
+        $trajet['agence_depart'] = $this->agenceModel->findById($trajet['agence_depart_id'])['nom'] ?? '';
+        $trajet['agence_arrivee'] = $this->agenceModel->findById($trajet['agence_arrivee_id'])['nom'] ?? '';
+        $user = $this->userModel->findById($trajet['auteur_id']);
+        $trajet['user_nom'] = $user['nom'] ?? '';
+        $trajet['user_prenom'] = $user['prenom'] ?? '';
+        $trajet['user_email'] = $user['email'] ?? '';
+        $trajet['user_tel'] = $user['telephone'] ?? '';
+        $trajet['places_dispo'] = $trajet['nb_places_disponibles'] ?? $trajet['nb_places_total'];
 
-    return $trajet;
-}
+        return $trajet;
+    }
 
     public function deleteTrajet(int $id): bool {
         if (empty($id)) {
@@ -98,6 +100,11 @@ class TrajetService {
         if (empty($id) || empty($data)) {
             throw new Exception("ID ou données invalides");
         }
+        
+        if (isset($data['nb_places_total'])) {
+             $data['nb_places_disponibles'] = $data['nb_places_total'];
+        }
+
         return $this->trajetModel->update($id, $data);
     }
 }
