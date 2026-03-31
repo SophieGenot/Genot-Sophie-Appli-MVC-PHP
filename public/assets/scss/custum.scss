@@ -24,7 +24,7 @@ $theme-colors: map-merge($theme-colors, (
 // 4. Import composants
 @import "header";
 @import "footer";
-@import "login-form";
+@import "login-forms";
 @import "trajet-card";
-@import "trajet-form";
+@import "trajet-forms";
 @import "admin-dashboard";

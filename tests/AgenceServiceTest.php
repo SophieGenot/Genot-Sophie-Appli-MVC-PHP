@@ -8,21 +8,14 @@ class AgenceServiceTest extends TestCase {
     private AgenceService $agenceService;
 
     protected function setUp(): void {
-        // Connexion à la base de test
         $this->pdo = new PDO("mysql:host=localhost;dbname=appklaxon_test", "root", "");
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Commencer une transaction pour isoler chaque test
         $this->pdo->beginTransaction();
-
         $this->agenceService = new AgenceService($this->pdo);
-
-        // Créer données nécessaires pour FK si besoin
-        $this->pdo->exec("DELETE FROM trajets"); // éviter conflit FK
+        $this->pdo->exec("DELETE FROM trajets"); 
     }
-
     protected function tearDown(): void {
-        // Rollback pour revenir à l'état initial après chaque test
         $this->pdo->rollBack();
     }
 
@@ -63,7 +56,6 @@ class AgenceServiceTest extends TestCase {
     }
 
     public function testCreateDuplicateAgence(): void {
-        // Vérifie qu’on ne peut pas créer deux agences avec le même nom
         $this->agenceService->createAgence("VilleUnique");
 
         $this->expectException(PDOException::class);

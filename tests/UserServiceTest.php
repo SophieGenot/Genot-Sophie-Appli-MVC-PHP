@@ -12,8 +12,6 @@ class UserServiceTest extends TestCase {
         $this->pdo = new PDO("mysql:host=localhost;dbname=appklaxon_test", "root", "");
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->userService = new UserService($this->pdo);
-
-        // Nettoyer la table pour un test propre
         $this->pdo->exec("DELETE FROM utilisateurs");
     }
 
