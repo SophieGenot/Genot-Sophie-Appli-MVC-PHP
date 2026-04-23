@@ -17,11 +17,9 @@ class AuthService extends AbstractService {
         if (!$user) {
             return false;
         }
-
         if (!password_verify($password, $user['mot_de_passe'])) {
             return false;
         }
-
         return $user;
     }
 }

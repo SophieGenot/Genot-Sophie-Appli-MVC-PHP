@@ -27,24 +27,33 @@ class UserService extends AbstractService {
 
     // Créer un nouvel utilisateur
     public function createUser(array $data): bool {
-        if (empty($data['nom']) || empty($data['prenom']) || empty($data['email']) || empty($data['mot_de_passe'])) {
+        if (empty($data['nom']) || empty($data['prenom']) || empty($data['email']) || empty($data['telephone']) || empty($data['mot_de_passe'])) {
             throw new Exception("Données utilisateur incomplètes");
         }
 
-        // Sécurité : Hashage du mot de passe
         $data['mot_de_passe'] = password_hash($data['mot_de_passe'], PASSWORD_DEFAULT);
 
         return $this->userModel->create($data);
     }
 
+    public function getUsersPendingValidation(): array {
+        return $this->userModel->findPending();
+    }
+    
+    public function validateUser(int $id): bool {
+        return $this->userModel->setValidationStatus($id, 1);
+    }
+
     // Mettre à jour un utilisateur
     public function updateUser(int $id, array $data): bool {
-        if (!empty($data['mot_de_passe'])) {
-            $data['mot_de_passe'] = password_hash($data['mot_de_passe'], PASSWORD_DEFAULT);
-        } else {
-            unset($data['mot_de_passe']);
-        }
-        return $this->userModel->update($id, $data);
+        // On prépare un tableau propre pour le Model
+        $cleanData = [
+            'nom'       => $data['nom'],
+            'prenom'    => $data['prenom'],
+            'telephone' => $data['telephone']
+        ];
+
+        return $this->userModel->update($id, $cleanData);
     }
 
     // Supprimer un utilisateur

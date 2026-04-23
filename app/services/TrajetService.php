@@ -17,6 +17,7 @@ class TrajetService extends AbstractService {
         $this->userModel = new User($this->pdo);
     }
 
+    // Fonction pour page d'accueil
     public function getAllTrajetsDisponiblesAvecInfos(): array {
         $trajets = $this->trajetModel->findDisponibles();
 
@@ -34,18 +35,20 @@ class TrajetService extends AbstractService {
         return $trajets;
     }
 
+    // Fonction Admin
     public function getAllTrajetsAvecInfos(): array {
         $trajets = $this->trajetModel->findAll();
 
         foreach ($trajets as &$t) {
             $t['agence_depart'] = $this->agenceModel->findById($t['agence_depart_id'])['nom'] ?? '';
             $t['agence_arrivee'] = $this->agenceModel->findById($t['agence_arrivee_id'])['nom'] ?? '';
+            
             $user = $this->userModel->findById($t['auteur_id']);
-            $t['user']['id'] = $t['auteur_id']; 
-            $t['nom'] = $user['nom'] ?? '';
-            $t['prenom'] = $user['prenom'] ?? '';
-            $t['email'] = $user['email'] ?? '';
-            $t['telephone'] = $user['telephone'] ?? '';
+            $t['user_nom'] = $user['nom'] ?? '';
+            $t['user_prenom'] = $user['prenom'] ?? '';
+            $t['user_email'] = $user['email'] ?? '';
+            $t['user_tel'] = $user['telephone'] ?? '';
+            
             $t['places_dispo'] = $t['nb_places_disponibles'] ?? $t['nb_places_total'];
         }
 
@@ -73,7 +76,7 @@ class TrajetService extends AbstractService {
         return $this->trajetModel->create($data);
     }
 
-    public function getTrajetById($id) {
+    public function getTrajetById(int $id) {
         $trajet = $this->trajetModel->findById($id);
         if (!$trajet) return null;
 

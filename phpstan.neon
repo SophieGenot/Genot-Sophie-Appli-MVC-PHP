@@ -1,5 +1,5 @@
 parameters:
-  level: 5   # niveau strictité (0 = faible, 8 = très strict)
+  level: 1  
   paths:
     - app/
     - public/
