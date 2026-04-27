@@ -4,14 +4,7 @@
 /** @var array $usersToValidate */
 ?>
 <main class="container mt-4">
-
-<?php if (isset($_SESSION['message_success'])): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <?= $_SESSION['message_success']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    <?php unset($_SESSION['message_success']); ?>
-<?php endif; ?>
+<section>
     <h1>Trajets disponibles</h1>
 
     <!-- Liste des trajets -->
@@ -21,8 +14,8 @@
             <div class="trajet-card">
                 <div class="trajet-header"><?= htmlspecialchars($trajet['agence_depart']); ?> → <?= htmlspecialchars($trajet['agence_arrivee']); ?></div>
                 <div class="trajet-info">
-                    <span>Départ: <?= htmlspecialchars($trajet['gdh_depart']); ?></span>
-                    <span>Arrivée: <?= htmlspecialchars($trajet['gdh_arrivee']); ?></span>
+                    <span>Départ: <?= AbstractService::formatDateFr($trajet['gdh_depart']); ?></span>
+                    <span>Arrivée:<?= AbstractService::formatDateFr($trajet['gdh_arrivee']); ?></span>
                     <span>Places dispo: <?= $trajet['places_dispo']; ?></span>
                 </div>
                 <?php if(isset($_SESSION['user'])): ?>
@@ -55,6 +48,8 @@
             <?php endif; ?>
         <?php endforeach; ?>
     </div>
+</section>
+<section>
 <?php if(!isset($_SESSION['user'])): ?>
 <div class="row mt-4">
     <div class="col-md-6" id="login-section">
@@ -108,7 +103,7 @@
     </div>
 </div>
 <?php endif; ?>
-   
+</section>
 </main>
 
 <?php include 'footer.php'; ?>

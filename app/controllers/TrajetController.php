@@ -8,7 +8,7 @@ class TrajetController extends AbstractController {
     private TrajetService $trajetService;
     private AgenceService $agenceService;
 
-    public function __construct($pdo) {
+    public function __construct(PDO$pdo) {
         parent::__construct($pdo); 
         $this->trajetService = new TrajetService($this->pdo);
         $this->agenceService = new AgenceService($this->pdo);
@@ -21,30 +21,42 @@ class TrajetController extends AbstractController {
     }
 
     // ------------------------ Dashboard employé ------------------------
-    public function listDashboardEmploye() {
-        $this->checkAuth();
+   public function listDashboardEmploye() {
+    // 1. Vérification auth
+    $this->checkAuth();
+    $userId = $_SESSION['user']['id'];
 
-        $trajets = $this->trajetService->getAllTrajetsAvecInfos();
+    // 2. Récupération des trajets
+    $trajets = $this->trajetService->getAllTrajetsAvecInfos();
 
-        $mes_trajets = [];
-        $autres_trajets = [];
+    $mes_trajets = [];
+    $autres_trajets = [];
 
-        foreach ($trajets as $trajet) {
-            $trajet['user']['id'] = $trajet['auteur_id'] ?? null;
+    foreach ($trajets as $trajet) {
+        $id_auteur = $trajet['auteur_id'] ?? null;
 
-            if ($trajet['user']['id'] === $_SESSION['user']['id']) {
-                $mes_trajets[] = $trajet;
-            } elseif (($trajet['places_dispo'] ?? 0) > 0) {
-                $autres_trajets[] = $trajet;
-            }
+        if ($id_auteur == $userId) {
+            $mes_trajets[] = $trajet;
+        } elseif (($trajet['places_dispo'] ?? 0) > 0) {
+            $autres_trajets[] = $trajet;
         }
-
-        $this->render('dashboard', [
-            'mes_trajets' => $mes_trajets,
-            'autres_trajets' => $autres_trajets
-        ]);
     }
 
+    // 3. Gestion des notifications (Déjà là)
+    $notifications = $this->trajetService->getNotificationsForUser($userId);
+
+    // 4. NOUVEAU : Récupération des trajets où l'utilisateur est PASSAGER
+    // On demande au service de nous donner les réservations de Sophie
+    $mes_reservations = $this->trajetService->getReservationsByPassenger($userId);
+
+    // 5. Rendu de la vue
+    $this->render('dashboard', [
+        'mes_trajets' => $mes_trajets,
+        'autres_trajets' => $autres_trajets,
+        'notifications' => $notifications,
+        'mes_reservations' => $mes_reservations 
+    ]);
+}
     // ------------------------ Création d'un trajet ------------------------
     public function createTrajet() {
         $this->checkAuth();
@@ -85,7 +97,7 @@ class TrajetController extends AbstractController {
         ]);
     }
 
-    public function editTrajet($trajetId) {
+    public function editTrajet(int$trajetId) {
         $this->checkAuth();
 
         $userId = $_SESSION['user']['id'];
@@ -134,4 +146,84 @@ class TrajetController extends AbstractController {
             'error' => $error
         ]);
     }
+
+    public function reserver() {
+    if (!isset($_SESSION['user'])) {
+        echo "La session est vide ! <br>";
+        var_dump($_SESSION); 
+        die("Arrêt du script : Pas de session utilisateur.");
+    }
+
+    $idTrajet = $_GET['id'] ?? null;
+
+    if ($idTrajet) {
+        try {
+            $this->trajetService->reserverPlace((int)$idTrajet, $_SESSION['user']);
+            
+            header('Location: index.php?action=dashboard_employe');
+            exit;
+
+        } catch (Exception $e) {
+            die("Erreur durant la réservation : " . $e->getMessage());
+        }
+    } else {
+        die("Erreur : Aucun ID de trajet reçu.");
+    }
+}
+
+public function deleteTrajet() {
+    $this->checkAuth(); // Sécurité : vérifie que l'utilisateur est connecté
+    
+    $id = isset($_POST['trajet_id']) ? (int)$_POST['trajet_id'] : null;
+    $userId = $_SESSION['user']['id'];
+    $userRole = $_SESSION['user']['role'];
+
+    if ($id) {
+        try {
+            // 1. Récupérer le trajet pour vérifier les droits
+            $trajet = $this->trajetService->getTrajetById($id);
+
+            if ($trajet) {
+                // 2. Autoriser si c'est l'auteur OU si c'est un admin
+                if ($trajet['auteur_id'] == $userId || $userRole === 'admin') {
+                    if ($this->trajetService->deleteTrajet($id)) {
+                        $_SESSION['message_success'] = "Le trajet a été supprimé avec succès.";
+                    } else {
+                        $_SESSION['message_error'] = "Erreur lors de la suppression en base de données.";
+                    }
+                } else {
+                    $_SESSION['message_error'] = "Action non autorisée : vous n'êtes pas l'auteur de ce trajet.";
+                }
+            } else {
+                $_SESSION['message_error'] = "Trajet introuvable.";
+            }
+        } catch (Exception $e) {
+            $_SESSION['message_error'] = "Erreur : " . $e->getMessage();
+        }
+    }
+
+    // 3. REDIRECTION STRICTE
+    if ($userRole === 'admin') {
+        $this->redirect('dashboard_admin');
+    } else {
+        $this->redirect('dashboard_employe');
+    }
+    exit;
+}
+
+public function annulerReservation() {
+    $resId = isset($_POST['reservation_id']) ? (int)$_POST['reservation_id'] : null;
+
+    if ($resId) {
+        try {
+            if ($this->trajetService->annulerUnePlace($resId)) {
+                $_SESSION['message_success'] = "Votre réservation a été annulée.";
+            }
+        } catch (Exception $e) {
+            $_SESSION['message_error'] = "Erreur : " . $e->getMessage();
+        }
+    }
+
+    $this->redirect('dashboard_employe');
+}
 }

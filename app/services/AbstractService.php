@@ -15,4 +15,10 @@ abstract class AbstractService {
     public static function isEmailValid(string $email): bool {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
+    public static function formatDateFr(?string $date, bool $withTime = true): string {
+    if (!$date) return "N/C";
+
+    $dateTime = new DateTime($date);
+    return $withTime ? $dateTime->format('d/m/Y à H\hi') : $dateTime->format('d/m/Y');
+    }
 }

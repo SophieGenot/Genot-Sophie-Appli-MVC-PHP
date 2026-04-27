@@ -1,4 +1,8 @@
-<div class="modal fade" id="trajetModal<?= $trajet['id']; ?>" tabindex="-1">
+<?php
+/** @var array $trajet */
+?>
+
+<div class="modal fade" id="trajetModal<?= htmlspecialchars($trajet['id']); ?>" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -6,15 +10,17 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Proposé par: <?= htmlspecialchars(($trajet['nom'] ?? '') . ' ' . ($trajet['prenom'] ?? '')); ?></p>
+                <p><strong>Proposé par:</strong> <?= htmlspecialchars(($trajet['user_prenom'] ?? '') . ' ' . ($trajet['user_nom'] ?? '')); ?></p>
                 
-                <p>Téléphone: <?= htmlspecialchars($trajet['telephone'] ?? 'Non renseigné'); ?></p>
+                <p><strong>Téléphone:</strong> <?= htmlspecialchars($trajet['user_tel'] ?? 'Non renseigné'); ?></p>
                 
-                <p>Email: <?= htmlspecialchars($trajet['email'] ?? 'Non renseigné'); ?></p>
+                <p><strong>Email:</strong> <?= htmlspecialchars($trajet['user_email'] ?? 'Non renseigné'); ?></p>
                 
-                <p>Total places: <?= $trajet['nb_places_total']; ?></p>
+                <hr>
                 
-                <p>Places disponibles: <?= $trajet['places_dispo'] ?? $trajet['nb_places_disponibles']; ?></p>
+                <p>Total places: <?= htmlspecialchars($trajet['nb_places_total']); ?></p>
+                
+                <p>Places disponibles: <?= htmlspecialchars($trajet['places_dispo'] ?? $trajet['nb_places_disponibles']); ?></p>
             </div>
         </div>
     </div>

@@ -17,12 +17,24 @@ class User extends AbstractModel {
      * * @param string $email L'adresse email fournie par l'utilisateur.
      * @return array|null Retourne les données de l'utilisateur ou null s'il n'existe pas.
      */
-    public function findByEmail(string $email): ?array {
-        $stmt = $this->pdo->prepare("SELECT * FROM utilisateurs WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
-    }
+    /**
+ * Exemple de requête préparée avec paramètre nommé pour contrer les injections SQL.
+ */
+public function findByEmail(string $email): ?array
+{
+    // On utilise :email au lieu de ?
+    $sql = "SELECT * FROM utilisateurs WHERE email = :email";
+    
+    $stmt = $this->pdo->prepare($sql);
+    
+    // On passe un tableau associatif à l'execute
+    $stmt->execute(['email' => $email]);
+    
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Retourne le tableau de l'utilisateur ou null s'il n'existe pas
+    return $user ?: null;
+}
 
     /**
      * Enregistre un nouvel utilisateur en base de données.

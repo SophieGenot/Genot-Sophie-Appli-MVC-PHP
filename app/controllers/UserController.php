@@ -2,6 +2,7 @@
 require_once __DIR__ . '/AbstractController.php'; 
 require_once __DIR__ . '/../services/AuthService.php';
 require_once __DIR__ . '/../services/UserService.php'; 
+require_once __DIR__ . '/../models/Reservation.php';
 
 /**
  * Contrôleur UserController
@@ -14,29 +15,31 @@ class UserController extends AbstractController {
     private $authService;
     /** @var UserService Service dédié à la gestion des comptes */
     private $userService; 
+     /** @var reservationModel Service dédié à la gestion des comptes */
+    private $reservationModel; 
 
     /**
      * Constructeur
-     * * @param PDO $pdo Injection de la connexion à la base de données.
+     * @param PDO $pdo Injection de la connexion à la base de données.
      */
     public function __construct($pdo) {
         parent::__construct($pdo);
         $this->authService = new AuthService($this->pdo);
         $this->userService = new UserService($this->pdo);
+        $this->reservationModel = new Reservation($this->pdo);
     }
 
     /**
      * Gère la tentative de connexion d'un utilisateur.
      * Vérifie la validité de l'email et authentifie l'utilisateur via le service.
      * Initialise la session utilisateur et redirige selon le rôle (admin ou employé).
-     * * @return void
      */
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
 
-            // Validation du format de l'email via une règle métier centralisée
+            // Validation du format de l'email
             if (!AbstractService::isEmailValid($email)) {
                 $_SESSION['login_error'] = "Format d'email invalide.";
                 $this->redirect('home#login');
@@ -44,6 +47,7 @@ class UserController extends AbstractController {
             }
 
             try {
+                // Appel au service (qui peut lever une Exception si non validé)
                 $user = $this->authService->login($email, $password);
 
                 if ($user) {
@@ -62,9 +66,16 @@ class UserController extends AbstractController {
                     } else {
                         $this->redirect('dashboard_employe');
                     }
+                    exit;
+                } else {
+                    // Cas où le service retourne false (mauvais identifiants)
+                    $_SESSION['login_error'] = "Identifiants incorrects.";
+                    $this->redirect('home#login');
+                    exit;
                 }
             } catch (Exception $e) {
-                // Gestion des erreurs d'authentification (mot de passe faux, compte non validé)
+                // RÉCUPÉRATION DE L'AMÉLIORATION :
+                // On attrape ici le message "Votre compte n'a pas encore été validé"
                 $_SESSION['login_error'] = $e->getMessage();
                 header('Location: index.php?action=home#login'); 
                 exit;
@@ -74,9 +85,6 @@ class UserController extends AbstractController {
 
     /**
      * Traite le formulaire d'inscription des nouveaux employés.
-     * Applique des contrôles de conformité sur l'email et le téléphone.
-     * Envoie la demande au service pour création en attente de validation.
-     * * @return void
      */
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -94,6 +102,7 @@ class UserController extends AbstractController {
                 if ($success) {
                     $_SESSION['message_success'] = "Demande envoyée ! Un administrateur doit valider votre compte avant votre première connexion.";
                     $this->redirect('home');
+                    exit;
                 }
             } catch (Exception $e) {
                 $_SESSION['register_error'] = $e->getMessage();
@@ -105,7 +114,6 @@ class UserController extends AbstractController {
 
     /**
      * Détruit la session en cours et redirige l'utilisateur vers la page d'accueil.
-     * * @return void
      */
     public function logout() {
         session_destroy();

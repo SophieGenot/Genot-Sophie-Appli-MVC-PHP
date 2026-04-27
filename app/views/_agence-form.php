@@ -8,8 +8,9 @@ $editMode = isset($agence);
                value="<?= htmlspecialchars($agence['nom'] ?? ''); ?>" required>
     </div>
 
-    <button type="submit" name="<?= $editMode ? 'update_agence' : 'create_agence'; ?>"
+    <button type="submit" 
+            name="<?= htmlspecialchars($editMode ? 'update_agence' : 'create_agence'); ?>"
             class="btn btn-primary">
-        <?= $editMode ? 'Mettre à jour' : 'Créer'; ?>
+        <?= htmlspecialchars($editMode ? 'Mettre à jour' : 'Créer'); ?>
     </button>
 </form>

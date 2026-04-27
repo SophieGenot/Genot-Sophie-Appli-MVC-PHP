@@ -71,4 +71,11 @@ class Trajet extends AbstractModel {
             $id
         ]);
     }
+    public function updatePlacesDisponibles(int $id, int $nouvellesPlaces): bool {
+    $sql = "UPDATE trajets SET nb_places_disponibles = :places WHERE id = :id";
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute(['places' => $nouvellesPlaces, 'id' => $id]);
+    }
 }
+
+

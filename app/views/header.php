@@ -27,3 +27,5 @@
         <?php endif; ?>
     </div>
 </header>
+
+<?php include __DIR__ . '/_messages.php'; ?>
