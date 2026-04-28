@@ -14,13 +14,6 @@ $theme-colors: map-merge($theme-colors, (
   "custom-light": $custom-light-blue
 ));
 
-// 3. Import Bootstrap
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/maps";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/root";
-@import "bootstrap/scss/bootstrap";
-
 // 4. Import composants
 @import "header";
 @import "footer";
@@ -28,3 +21,11 @@ $theme-colors: map-merge($theme-colors, (
 @import "trajet-card";
 @import "trajet-forms";
 @import "admin-dashboard";
+
+// 3. Import Bootstrap
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/bootstrap";
+

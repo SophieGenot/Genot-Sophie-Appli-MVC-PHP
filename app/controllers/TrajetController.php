@@ -59,43 +59,36 @@ class TrajetController extends AbstractController {
 }
     // ------------------------ Création d'un trajet ------------------------
     public function createTrajet() {
-        $this->checkAuth();
+    $this->checkAuth();
+    $agences = $this->agenceService->getAllAgences();
+    $error = '';
 
-        $userId = $_SESSION['user']['id'];
-        $agences = $this->agenceService->getAllAgences();
-        $error = '';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        try {
+            // On prépare le tableau de données à envoyer au service
+            $formData = [
+                'agence_depart_id' => $_POST['agence_depart_id'],
+                'agence_arrivee_id' => $_POST['agence_arrivee_id'],
+                'gdh_depart'        => $_POST['gdh_depart'],
+                'gdh_arrivee'       => $_POST['gdh_arrivee'],
+                'nb_places_total'   => (int)$_POST['nb_places_total'],
+                'auteur_id'         => $_SESSION['user']['id']
+            ];
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $departId = $_POST['agence_depart_id'];
-            $arriveeId = $_POST['agence_arrivee_id'];
-            $gdhDepart = $_POST['gdh_depart'];
-            $gdhArrivee = $_POST['gdh_arrivee'];
-            $nbPlaces = (int)$_POST['nb_places_total'];
+            // On appelle le service. S'il y a une erreur, il "saute" directement au catch
+            $this->trajetService->createTrajet($formData);
+            
+            $this->redirect('dashboard_employe');
 
-            if ($departId == $arriveeId) {
-                $error = "L'agence de départ et d'arrivée doivent être différentes.";
-            } elseif (strtotime($gdhDepart) >= strtotime($gdhArrivee)) {
-                $error = "La date/heure d'arrivée doit être après la date/heure de départ.";
-            } elseif ($nbPlaces < 1 || $nbPlaces > 4) {
-                $error = "Le nombre de places doit être compris entre 1 et 4.";
-            } else {
-                $this->trajetService->createTrajet([
-                    'agence_depart_id' => $departId,
-                    'agence_arrivee_id' => $arriveeId,
-                    'gdh_depart' => $gdhDepart,
-                    'gdh_arrivee' => $gdhArrivee,
-                    'nb_places_total' => $nbPlaces,
-                    'auteur_id' => $userId
-                ]);
-                $this->redirect('dashboard_employe');
-            }
+        } catch (Exception $e) {
+            // On récupère le message de l'exception lancée dans le service
+            $error = $e->getMessage();
         }
-
-        $this->render('_trajet-form', [
-            'agences' => $agences,
-            'error' => $error
-        ]);
     }
+    
+    // On affiche la vue avec les agences et l'éventuelle erreur
+    require __DIR__ . '/../views/_trajet-form.php';
+}
 
     public function editTrajet(int$trajetId) {
         $this->checkAuth();

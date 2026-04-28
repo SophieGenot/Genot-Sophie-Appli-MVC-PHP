@@ -23,6 +23,7 @@ class AdminController extends AbstractController {
     }
 
     public function dashboard() {
+        // Gestion des agences (Idéalement à séparer en méthodes distinctes plus tard)
         if (isset($_POST['create_agence'])) {
             $this->agenceService->createAgence($_POST['nom_agence']);
         }
@@ -42,8 +43,7 @@ class AdminController extends AbstractController {
     }
 
     public function validateUser(int $id) {
-        if ($id) {
-            $this->userService->validateUser($id);
+        if ($id && $this->userService->validateUser($id)) {
             $_SESSION['message_success'] = "Utilisateur validé.";
         }
         $this->redirect('dashboard_admin');
@@ -51,41 +51,24 @@ class AdminController extends AbstractController {
 
     public function updateUserAdmin() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'])) {
-            $id = (int)$_POST['user_id'];
-            $tel = $_POST['telephone'] ?? '';
-
-            if (!AbstractService::isPhoneValid($tel)) {
-               $_SESSION['message_error'] = "Le numéro est incorrect. Il doit contenir exactement 10 chiffres.";
-               $this->redirect('dashboard_admin');
-               exit;
-            }
-
-            $data = [
-                'nom'       => $_POST['nom'],
-                'prenom'    => $_POST['prenom'],
-                'telephone' => $tel,
-            ];
-
-            if ($this->userService->updateUser($id, $data)) {
+            try {
+                $this->userService->updateUser((int)$_POST['user_id'], $_POST);
                 $_SESSION['message_success'] = "Utilisateur mis à jour !";
+            } catch (Exception $e) {
+                $_SESSION['message_error'] = $e->getMessage();
             }
         }
         $this->redirect('dashboard_admin');
     }
 
     public function deleteUser() {
-        // Sécurité : vérification que la requête est bien en POST
         $id = isset($_POST['user_id']) ? (int)$_POST['user_id'] : null;
-
         if ($id) {
-            if ($id == $_SESSION['user']['id']) {
-                $_SESSION['message_error'] = "Vous ne pouvez pas supprimer votre propre compte.";
-            } else {
-                if ($this->userService->deleteUser($id)) {
-                    $_SESSION['message_success'] = "Utilisateur supprimé.";
-                } else {
-                    $_SESSION['message_error'] = "Erreur lors de la suppression.";
-                }
+            try {
+                $this->userService->deleteUser($id, $_SESSION['user']['id']);
+                $_SESSION['message_success'] = "Utilisateur supprimé.";
+            } catch (Exception $e) {
+                $_SESSION['message_error'] = $e->getMessage();
             }
         }
         $this->redirect('dashboard_admin');
@@ -93,13 +76,10 @@ class AdminController extends AbstractController {
 
     public function deleteTrajetAdmin() {
         $id = isset($_POST['trajet_id']) ? (int)$_POST['trajet_id'] : null;
-        
-        if ($id) {
-            if ($this->trajetService->deleteTrajet($id)) {
-                $_SESSION['message_success'] = "Trajet supprimé avec succès.";
-            } else {
-                $_SESSION['message_error'] = "Erreur lors de la suppression du trajet.";
-            }
+        if ($id && $this->trajetService->deleteTrajet($id)) {
+            $_SESSION['message_success'] = "Trajet supprimé avec succès.";
+        } else {
+            $_SESSION['message_error'] = "Erreur lors de la suppression du trajet.";
         }
         $this->redirect('dashboard_admin');
     }

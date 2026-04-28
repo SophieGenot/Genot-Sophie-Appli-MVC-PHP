@@ -4,61 +4,66 @@ require_once __DIR__ . '/../app/services/AgenceService.php';
 
 class AgenceServiceTest extends TestCase {
 
-    private PDO $pdo;
-    private AgenceService $agenceService;
+    private $pdo;
+    private $agenceService;
 
     protected function setUp(): void {
+        // Connexion à la base de test
         $this->pdo = new PDO("mysql:host=localhost;dbname=appklaxon_test", "root", "");
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $this->pdo->beginTransaction();
         $this->agenceService = new AgenceService($this->pdo);
-        $this->pdo->exec("DELETE FROM trajets"); 
-    }
-    protected function tearDown(): void {
-        $this->pdo->rollBack();
+        
+        // Nettoyage radical avant chaque test pour éviter les doublons
+        $this->pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
+        $this->pdo->exec("DELETE FROM agences");
+        $this->pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
     }
 
     public function testCreateAgence(): void {
-        $result = $this->agenceService->createAgence("TestVille");
+        $nom = "Agence Paris";
+        
+        $result = $this->agenceService->createAgence($nom);
         $this->assertTrue($result);
 
+        // Vérification en base
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM agences");
-        $count = $stmt->fetchColumn();
-        $this->assertEquals(1, $count);
+        $this->assertEquals(1, $stmt->fetchColumn());
     }
 
     public function testUpdateAgence(): void {
-        $this->agenceService->createAgence("AncienneVille");
-        $stmt = $this->pdo->query("SELECT id FROM agences LIMIT 1");
-        $id = $stmt->fetchColumn();
+        // 1. Création
+        $this->agenceService->createAgence("Ancien Nom");
+        $id = $this->pdo->lastInsertId();
 
-        $result = $this->agenceService->updateAgence($id, "NouvelleVille");
+        // 2. Modification
+        $result = $this->agenceService->updateAgence($id, "Nouveau Nom");
         $this->assertTrue($result);
 
+        // 3. Vérification
         $stmt = $this->pdo->prepare("SELECT nom FROM agences WHERE id = ?");
         $stmt->execute([$id]);
-        $nom = $stmt->fetchColumn();
-        $this->assertEquals("NouvelleVille", $nom);
+        $this->assertEquals("Nouveau Nom", $stmt->fetchColumn());
     }
 
     public function testDeleteAgence(): void {
-        $this->agenceService->createAgence("VilleASupprimer");
-        $stmt = $this->pdo->query("SELECT id FROM agences LIMIT 1");
-        $id = $stmt->fetchColumn();
+        // 1. Création
+        $this->agenceService->createAgence("Agence a supprimer");
+        $id = $this->pdo->lastInsertId();
 
+        // 2. Suppression
         $result = $this->agenceService->deleteAgence($id);
         $this->assertTrue($result);
 
+        // 3. Vérification
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM agences");
-        $count = $stmt->fetchColumn();
-        $this->assertEquals(0, $count);
+        $this->assertEquals(0, $stmt->fetchColumn());
     }
 
-    public function testCreateDuplicateAgence(): void {
-        $this->agenceService->createAgence("VilleUnique");
+    public function testCreateAgenceEmptyNameThrowsException(): void {
+        // On vérifie que ton Service lève bien une exception si le nom est vide
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Le nom de l'agence est requis.");
 
-        $this->expectException(PDOException::class);
-        $this->agenceService->createAgence("VilleUnique");
+        $this->agenceService->createAgence("");
     }
 }

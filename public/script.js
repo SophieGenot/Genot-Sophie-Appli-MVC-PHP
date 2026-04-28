@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectDepart.addEventListener('change', updateOptions);
             selectArrivee.addEventListener('change', updateOptions);
             
-            updateOptions(); // Appel initial
+            updateOptions(); 
         }
     }
 });

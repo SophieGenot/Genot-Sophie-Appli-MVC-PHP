@@ -10,29 +10,23 @@ class UserService extends AbstractService {
         $this->userModel = new User($this->pdo);
     }
 
-    // Récupérer tous les utilisateurs
     public function getAllUsers(): array {
         return $this->userModel->findAll();
     }
 
-    // Récupérer un utilisateur par ID
     public function getUserById(int $id): ?array {
         return $this->userModel->findById($id);
     }
 
-    // Récupérer un utilisateur par email
     public function getUserByEmail(string $email): ?array {
         return $this->userModel->findByEmail($email);
     }
 
-    // Créer un nouvel utilisateur
     public function createUser(array $data): bool {
         if (empty($data['nom']) || empty($data['prenom']) || empty($data['email']) || empty($data['telephone']) || empty($data['mot_de_passe'])) {
-            throw new Exception("Données utilisateur incomplètes");
+            throw new Exception("Données utilisateur incomplètes.");
         }
-
         $data['mot_de_passe'] = password_hash($data['mot_de_passe'], PASSWORD_DEFAULT);
-
         return $this->userModel->create($data);
     }
 
@@ -44,20 +38,25 @@ class UserService extends AbstractService {
         return $this->userModel->setValidationStatus($id, 1);
     }
 
-    // Mettre à jour un utilisateur
     public function updateUser(int $id, array $data): bool {
-        // On prépare un tableau propre pour le Model
+        // Validation du téléphone déportée dans le Service
+        if (isset($data['telephone']) && !AbstractService::isPhoneValid($data['telephone'])) {
+            throw new Exception("Le numéro est incorrect. Il doit contenir exactement 10 chiffres.");
+        }
+
         $cleanData = [
             'nom'       => $data['nom'],
             'prenom'    => $data['prenom'],
-            'telephone' => $data['telephone']
+            'telephone' => $data['telephone'] ?? ''
         ];
 
         return $this->userModel->update($id, $cleanData);
     }
 
-    // Supprimer un utilisateur
-    public function deleteUser(int $id): bool {
+    public function deleteUser(int $id, int $currentAdminId): bool {
+        if ($id === $currentAdminId) {
+            throw new Exception("Sécurité : Vous ne pouvez pas supprimer votre propre compte administrateur.");
+        }
         return $this->userModel->delete($id);
     }
 }
