@@ -15,8 +15,6 @@ class UserController extends AbstractController {
     private $authService;
     /** @var UserService Service dédié à la gestion des comptes */
     private $userService; 
-     /** @var reservationModel Service dédié à la gestion des comptes */
-    private $reservationModel; 
 
     /**
      * Constructeur
@@ -26,7 +24,6 @@ class UserController extends AbstractController {
         parent::__construct($pdo);
         $this->authService = new AuthService($this->pdo);
         $this->userService = new UserService($this->pdo);
-        $this->reservationModel = new Reservation($this->pdo);
     }
 
     /**

@@ -1,13 +1,18 @@
 <?php
-/** @var array $trajets */
-/** @var array $users */
+/** @var array|null $usersToValidate */
+/** @var array $agences         */
+/** @var array $trajets          */
+/** @var array $users       */
 ?>
+
+<h2>Tableau de bord Administrateur</h2>
+...
 <?php include 'header.php'; ?>
 
 <main class="container mt-4 admin-dashboard">
     <h1>Tableau de bord Admin</h1>
 
-    <?php if (!empty($usersToValidate)): ?>
+    <?php if (count($usersToValidate) > 0): ?>
         <section class="mb-5 p-3 border border-warning rounded bg-light">
             <h2 class="text-warning">
                 <i class="bi bi-person-plus-fill"></i> 
@@ -23,7 +28,7 @@
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($usersToValidate)): ?>
+            <?php if ($usersToValidate):?>
                 <?php foreach ($usersToValidate as $u): ?>
                     <tr>
                         <td>

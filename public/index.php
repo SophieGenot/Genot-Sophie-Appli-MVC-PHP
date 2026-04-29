@@ -16,7 +16,7 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../app/controllers/UserController.php';
 require_once __DIR__ . '/../app/controllers/TrajetController.php';
 require_once __DIR__ . '/../app/controllers/AdminController.php';
-
+/** @var PDO $pdo */
 // 4. DÉMARRAGE SESSION
 session_start();
 
