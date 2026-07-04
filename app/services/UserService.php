@@ -23,7 +23,8 @@ class UserService extends AbstractService {
     }
 
     public function createUser(array $data): bool {
-        if (empty($data['nom']) || empty($data['prenom']) || empty($data['email']) || empty($data['telephone']) || empty($data['mot_de_passe'])) {
+        if (empty($data['nom']) || empty($data['prenom']) || empty($data['email']) ||
+         empty($data['telephone']) || empty($data['mot_de_passe'])) {
             throw new Exception("Données utilisateur incomplètes.");
         }
         $data['mot_de_passe'] = password_hash($data['mot_de_passe'], PASSWORD_DEFAULT);

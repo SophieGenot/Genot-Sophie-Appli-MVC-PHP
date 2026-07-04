@@ -58,22 +58,20 @@ class TrajetService extends AbstractService {
         throw new Exception("Tous les champs sont obligatoires.");
     }
 
-    // 2. Logique agences (Déplacé du Controller)
     if ($data['agence_depart_id'] == $data['agence_arrivee_id']) {
         throw new Exception("L'agence de départ et d'arrivée doivent être différentes.");
     }
 
-    // 3. Logique dates (Déplacé du Controller)
     if (strtotime($data['gdh_depart']) >= strtotime($data['gdh_arrivee'])) {
         throw new Exception("La date d'arrivée doit être postérieure au départ.");
     }
 
     // 4. Logique places
-    if ($data['nb_places_total'] < 1 || $data['nb_places_total'] > 4) {
-        throw new Exception("Le nombre de places doit être compris entre 1 et 4.");
+    if ($data['nb_places_total'] < 1 || $data['nb_places_total'] > 8) {
+        throw new Exception("Le nombre de places doit être compris entre 1 et 8.");
     }
 
-    // Si tout est OK, on prépare la donnée pour le modèle
+    // Si OK, prépare donnée pour modèle
     $data['nb_places_disponibles'] = $data['nb_places_total'];
     return $this->trajetModel->create($data);
 }

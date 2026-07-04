@@ -14,7 +14,8 @@
                 Modifier
             </button>
 
-            <form method="POST" action="index.php?action=delete_user" class="m-0" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+            <form method="POST" action="index.php?action=delete_user" class="m-0" 
+            onsubmit="return confirm('Supprimer cet utilisateur ?');">
                 <input type="hidden" name="user_id" value="<?= htmlspecialchars($user['id']); ?>">
                 <button type="submit" class="btn btn-sm btn-outline-danger">
                     Supprimer

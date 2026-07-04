@@ -22,17 +22,12 @@ class User extends AbstractModel {
  */
 public function findByEmail(string $email): ?array
 {
-    // On utilise :email au lieu de ?
     $sql = "SELECT * FROM utilisateurs WHERE email = :email";
     
     $stmt = $this->pdo->prepare($sql);
-    
-    // On passe un tableau associatif à l'execute
     $stmt->execute(['email' => $email]);
     
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    // Retourne le tableau de l'utilisateur ou null s'il n'existe pas
     return $user ?: null;
 }
 

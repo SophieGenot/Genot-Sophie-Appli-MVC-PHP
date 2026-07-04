@@ -64,7 +64,7 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Nombre de places</label>
-            <input type="number" name="nb_places_total" class="form-control" min="1" max="4" required
+            <input type="number" name="nb_places_total" class="form-control" min="1" max="8" required
                    value="<?= isset($trajet) ? htmlspecialchars($trajet['nb_places_total']) : ''; ?>">
         </div>
 

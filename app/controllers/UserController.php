@@ -97,7 +97,8 @@ class UserController extends AbstractController {
                 $success = $this->userService->createUser($_POST);
 
                 if ($success) {
-                    $_SESSION['message_success'] = "Demande envoyée ! Un administrateur doit valider votre compte avant votre première connexion.";
+                    $_SESSION['message_success'] = "Demande envoyée ! 
+                    Un administrateur doit valider votre compte avant votre première connexion.";
                     $this->redirect('home');
                     exit;
                 }

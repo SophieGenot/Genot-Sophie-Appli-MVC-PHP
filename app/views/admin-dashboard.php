@@ -5,8 +5,6 @@
 /** @var array $users       */
 ?>
 
-<h2>Tableau de bord Administrateur</h2>
-...
 <?php include 'header.php'; ?>
 
 <main class="container mt-4 admin-dashboard">

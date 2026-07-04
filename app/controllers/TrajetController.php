@@ -3,6 +3,7 @@ require_once __DIR__ . '/AbstractController.php';
 require_once __DIR__ . '/../services/TrajetService.php';
 require_once __DIR__ . '/../services/AgenceService.php';
 
+
 class TrajetController extends AbstractController {
 
     private TrajetService $trajetService;
@@ -21,40 +22,47 @@ class TrajetController extends AbstractController {
     }
 
     // ------------------------ Dashboard employé ------------------------
-   public function listDashboardEmploye() {
-    // 1. Vérification auth
+ public function listDashboardEmploye() {
+    // 1. Vérification de l'authentification
     $this->checkAuth();
     $userId = $_SESSION['user']['id'];
 
-    // 2. Récupération des trajets
+    // Récupération du filtre de recherche (depuis le formulaire en méthode GET)
+    $searchAgenceId = $_GET['search_agence_id'] ?? null;
+
+    // 2. Récupération des données brutes depuis les services
     $trajets = $this->trajetService->getAllTrajetsAvecInfos();
+    $agences = $this->agenceService->getAllAgences();
+    $notifications = $this->trajetService->getNotificationsForUser($userId);
+    $mes_reservations = $this->trajetService->getReservationsByPassenger($userId);
 
     $mes_trajets = [];
     $autres_trajets = [];
 
+    // 3. Tri et filtrage des trajets
     foreach ($trajets as $trajet) {
         $id_auteur = $trajet['auteur_id'] ?? null;
 
         if ($id_auteur == $userId) {
+            // C'est un trajet créé par l'utilisateur connecté
             $mes_trajets[] = $trajet;
         } elseif (($trajet['places_dispo'] ?? 0) > 0) {
-            $autres_trajets[] = $trajet;
+            
+            // Logique de filtrage dynamique par agence de départ
+            if (empty($searchAgenceId) || $trajet['agence_depart_id'] == $searchAgenceId) {
+                $autres_trajets[] = $trajet;
+            }
         }
     }
 
-    // 3. Gestion des notifications (Déjà là)
-    $notifications = $this->trajetService->getNotificationsForUser($userId);
-
-    // 4. NOUVEAU : Récupération des trajets où l'utilisateur est PASSAGER
-    // On demande au service de nous donner les réservations de Sophie
-    $mes_reservations = $this->trajetService->getReservationsByPassenger($userId);
-
-    // 5. Rendu de la vue
+    // 4. UN SEUL ET UNIQUE RENDU FINAL AVEC TOUTES LES DONNÉES
+    // Note : On utilise 'dashboard_employe' puisque c'est le nom de l'action qui fonctionne dans ton routeur
     $this->render('dashboard', [
-        'mes_trajets' => $mes_trajets,
-        'autres_trajets' => $autres_trajets,
-        'notifications' => $notifications,
-        'mes_reservations' => $mes_reservations 
+        'mes_trajets'      => $mes_trajets,
+        'autres_trajets'   => $autres_trajets,
+        'notifications'    => $notifications,
+        'mes_reservations' => $mes_reservations,
+        'agences'          => $agences // La variable $agences est maintenant bien initialisée et transmise !
     ]);
 }
     // ------------------------ Création d'un trajet ------------------------

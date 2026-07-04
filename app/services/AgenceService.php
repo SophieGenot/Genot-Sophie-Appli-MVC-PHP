@@ -11,28 +11,31 @@ class AgenceService extends AbstractService {
     }
 
     // Récupérer toutes les agences
-    public function getAllAgences() {
+    public function getAllAgences(): array {
         return $this->agenceModel->findAll();
     }
 
     // Créer une agence
-    public function createAgence($nom) {
-        if (empty($nom)) {
+    public function createAgence(string $name): bool {
+        // CORRECTION : On teste bien $name
+        if (empty($name)) {
             throw new Exception("Le nom de l'agence est requis.");
         }
-        return $this->agenceModel->create($nom);
+        return $this->agenceModel->create($name);
     }
 
     // Modifier une agence existante
-    public function updateAgence($id, $nom) {
-        if (empty($id) || empty($nom)) {
+    public function updateAgence(int $id, string $name): bool {
+        // CORRECTION : On teste bien $name et on a typé int et string
+        if (empty($id) || empty($name)) {
             throw new Exception("ID et nom valides requis pour la mise à jour.");
         }
-        return $this->agenceModel->update($id, $nom);
+        return $this->agenceModel->update($id, $name);
     }
 
     // Supprimer une agence
-    public function deleteAgence($id) {
+    public function deleteAgence(int $id): bool {
+        // CORRECTION : On a typé int ici aussi
         if (empty($id)) {
             throw new Exception("ID valide requis pour la suppression.");
         }

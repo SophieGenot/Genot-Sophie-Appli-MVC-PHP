@@ -19,24 +19,18 @@ class AuthService extends AbstractService {
      * @return array|false
      */
     public function login(string $email, string $password) {
+        
         $user = $this->userModel->findByEmail($email);
-
-        // 1. On vérifie si l'utilisateur existe
         if (!$user) {
             return false;
         }
-
-        // 2. On vérifie si le mot de passe est correct
         if (!password_verify($password, $user['mot_de_passe'])) {
             return false;
         }
-
-        // 3. Vérification du compte validé (Amélioration)
-        if ((int)$user['is_validated'] !== 1) {
-            throw new Exception("Votre compte n'a pas encore été validé par un administrateur.");
+        if ($user['role'] !== 'admin' && (int)$user['is_validated'] !== 1) {
+            throw new Exception("Votre compte n'a pas encore été validé par 
+            un administrateur.");
         }
-
-        // Si tout est ok, on retourne l'utilisateur
         return $user;
     }
 }
